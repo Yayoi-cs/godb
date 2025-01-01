@@ -239,3 +239,362 @@ func GetGs(pid int) (uint64, error) {
 	}
 	return regs.Gs, nil
 }
+
+func SetRegs(pid int, regs *syscall.PtraceRegs) error {
+	err := syscall.PtraceSetRegs(pid, regs)
+	if err != nil {
+		return errors.New(stWrong)
+	}
+	return nil
+}
+
+func SetR15(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R15 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetR14(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R14 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetR13(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R13 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetR12(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R12 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRbp(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rbp = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRbx(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rbx = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetR11(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R11 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetR10(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R10 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetR9(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R9 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetR8(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.R8 = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRax(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rax = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRcx(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rcx = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRdx(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rdx = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRsi(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rsi = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRdi(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rdi = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetOrig_rax(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Orig_rax = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRip(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rip = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetCs(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Cs = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetEflags(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Eflags = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetRsp(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Rsp = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetSs(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Ss = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetFs_base(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Fs_base = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetGs_base(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Gs_base = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetDs(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Ds = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetEs(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Es = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetFs(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Fs = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func SetGs(pid int, val uint64) error {
+	regs, err := GetRegs(pid)
+	if err != nil {
+		return err
+	}
+	regs.Gs = val
+	err = SetRegs(pid, regs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
