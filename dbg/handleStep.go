@@ -5,24 +5,16 @@ import (
 	"syscall"
 )
 
-func C(pid int) error {
-	return Continue(pid)
-}
-
-func Continue(pid int) error {
-	err := syscall.PtraceCont(pid, 0)
+func (dbger *TypeDbg) Continue() error {
+	err := syscall.PtraceCont(dbger.pid, 0)
 	if err != nil {
 		fmt.Errorf("[-]failed to continue")
 	}
 	return nil
 }
 
-func S(pid int) error {
-	return Step(pid)
-}
-
-func Step(pid int) error {
-	err := syscall.PtraceSingleStep(pid)
+func (dbger *TypeDbg) Step() error {
+	err := syscall.PtraceSingleStep(dbger.pid)
 	if err != nil {
 		fmt.Errorf("[-]failed to stepi")
 	}

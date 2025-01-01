@@ -7,12 +7,12 @@ import (
 	"syscall"
 )
 
-type Dbger struct {
+type TypeDbg struct {
 	pid int
 	bps map[uint64]*TypeBp
 }
 
-func Run(bin string, args ...string) (*Dbger, error) {
+func Run(bin string, args ...string) (*TypeDbg, error) {
 	cmd := exec.Command(bin, args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -26,7 +26,7 @@ func Run(bin string, args ...string) (*Dbger, error) {
 		log.Fatalf("failed to start %v: %v", bin, err)
 	}
 
-	dbger := &Dbger{
+	dbger := &TypeDbg{
 		pid: cmd.Process.Pid,
 		bps: make(map[uint64]*TypeBp),
 	}

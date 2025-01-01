@@ -2,12 +2,14 @@ package dbg
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"syscall"
 )
 
-func NewBp[T string | uintptr](bpAddr T, pid int) (*TypeBp, error) {
-	switch v := any(bpAddr).(type) {
+func (dbger *TypeDbg) Break(bpAddr interface{}) (*TypeBp, error) {
+	pid := dbger.pid
+	switch v := bpAddr.(type) {
 	case uintptr:
 		nbp, err := newBp(v, pid)
 		if err != nil {
@@ -16,18 +18,20 @@ func NewBp[T string | uintptr](bpAddr T, pid int) (*TypeBp, error) {
 		return nbp, nil
 	case string:
 		fmt.Println("to be continued")
+	default:
+		return nil, errors.New(typeError)
 	}
 	return nil, nil
 }
 
 type TypeBp struct {
-	pid    int
-	addr   uintptr
-	instr  []byte
-	enable bool
+	pid      int
+	addr     uintptr
+	instr    []byte
+	isEnable bool
 }
 
-func enable(bp *TypeBp) error {
+func (bp *TypeBp) enable() error {
 	_, err := syscall.PtracePeekData(bp.pid, bp.addr, bp.instr)
 	if err != nil {
 		return err
@@ -50,9 +54,9 @@ func newBp(bpAddr uintptr, pid int) (*TypeBp, error) {
 		addr:  bpAddr,
 		instr: make([]byte, 8),
 	}
-	if err := enable(bp); err != nil {
+	if err := bp.enable(); err != nil {
 		return nil, err
 	}
-	bp.enable = true
+	bp.isEnable = true
 	return bp, nil
 }
