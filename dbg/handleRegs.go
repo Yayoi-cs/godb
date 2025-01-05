@@ -2,22 +2,22 @@ package dbg
 
 import (
 	"errors"
-	"syscall"
+	"golang.org/x/sys/unix"
 )
 
-func (dbger *TypeDbg) GetRegs() (*syscall.PtraceRegs, error) {
+func (dbger *TypeDbg) GetRegs() (*unix.PtraceRegs, error) {
 	pid := dbger.pid
-	var ws syscall.WaitStatus
-	_, err := syscall.Wait4(pid, &ws, syscall.WNOHANG, nil)
+	var ws unix.WaitStatus
+	_, err := unix.Wait4(pid, &ws, unix.WNOHANG, nil)
 	if err != nil {
 		return nil, err
 	}
-	if !ws.Stopped() && ws.Signal() != syscall.SIGSTOP {
+	if !ws.Stopped() && ws.Signal() != unix.SIGSTOP {
 		return nil, errors.New(plsStop)
 	}
 
-	regs := &syscall.PtraceRegs{}
-	err = syscall.PtraceGetRegs(pid, regs)
+	regs := &unix.PtraceRegs{}
+	err = unix.PtraceGetRegs(pid, regs)
 	if err != nil {
 		return nil, errors.New(stWrong)
 	}
@@ -241,9 +241,9 @@ func (dbger *TypeDbg) GetGs() (uint64, error) {
 	return regs.Gs, nil
 }
 
-func (dbger *TypeDbg) SetRegs(regs *syscall.PtraceRegs) error {
+func (dbger *TypeDbg) SetRegs(regs *unix.PtraceRegs) error {
 	pid := dbger.pid
-	err := syscall.PtraceSetRegs(pid, regs)
+	err := unix.PtraceSetRegs(pid, regs)
 	if err != nil {
 		return errors.New(stWrong)
 	}

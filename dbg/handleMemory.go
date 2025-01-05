@@ -3,12 +3,12 @@ package dbg
 import (
 	"encoding/binary"
 	"errors"
-	"syscall"
+	"golang.org/x/sys/unix"
 )
 
 func (dbger *TypeDbg) GetMemory(n uint, addr uintptr) ([]byte, error) {
 	mem := make([]byte, n)
-	count, err := syscall.PtracePeekData(dbger.pid, addr, mem)
+	count, err := unix.PtracePeekData(dbger.pid, addr, mem)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (dbger *TypeDbg) GetMemory8(addr uintptr) (uint64, error) {
 }
 
 func (dbger *TypeDbg) SetMemory(data []byte, addr uintptr) error {
-	count, err := syscall.PtracePokeData(dbger.pid, addr, data)
+	count, err := unix.PtracePokeData(dbger.pid, addr, data)
 	if err != nil {
 		return err
 	}

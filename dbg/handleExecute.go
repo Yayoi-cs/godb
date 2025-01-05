@@ -3,13 +3,13 @@ package dbg
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/sys/unix"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 )
 
 type TypeDbg struct {
@@ -100,7 +100,7 @@ func Run(bin string, args ...string) (*TypeDbg, error) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	cmd.SysProcAttr = &syscall.SysProcAttr{
+	cmd.SysProcAttr = &unix.SysProcAttr{
 		Ptrace: true,
 	}
 

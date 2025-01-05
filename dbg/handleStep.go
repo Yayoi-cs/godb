@@ -2,12 +2,12 @@ package dbg
 
 import (
 	"fmt"
-	"syscall"
+	"golang.org/x/sys/unix"
 )
 
-func (dbger *TypeDbg) wait() (syscall.WaitStatus, error) {
-	var ws syscall.WaitStatus
-	_, err := syscall.Wait4(0, &ws, syscall.WALL, nil)
+func (dbger *TypeDbg) wait() (unix.WaitStatus, error) {
+	var ws unix.WaitStatus
+	_, err := unix.Wait4(0, &ws, unix.WALL, nil)
 	if err != nil {
 		return 0, err
 	}
@@ -25,28 +25,34 @@ func (dbger *TypeDbg) Continue() error {
 	bp, ok := dbger.bps[uintptr(rip)]
 	if ok {
 		if bp.isEnable {
-			err = bp.DisableBp()
-			if err != nil {
+			if err := bp.DisableBp(); err != nil {
 				return err
 			}
-			err = dbger.Step()
-			if err != nil {
+			if err := dbger.SetRip(rip - 1); err != nil {
 				return err
 			}
-
+			if err := dbger.Step(); err != nil {
+				return err
+			}
+			if _, err = dbger.wait(); err != nil {
+				return err
+			}
+			if err := bp.EnableBp(); err != nil {
+				return err
+			}
 		}
 	}
-	err = syscall.PtraceCont(dbger.pid, 0)
+	err = unix.PtraceCont(dbger.pid, 0)
 	if err != nil {
-		fmt.Errorf("[-]failed to continue")
+		fmt.Errorf("[-]failed to continue: %w", err)
 	}
 	return nil
 }
 
 func (dbger *TypeDbg) Step() error {
-	err := syscall.PtraceSingleStep(dbger.pid)
+	err := unix.PtraceSingleStep(dbger.pid)
 	if err != nil {
-		fmt.Errorf("[-]failed to stepi")
+		fmt.Errorf("[-]failed to stepi: %w", err)
 	}
 	return nil
 }
