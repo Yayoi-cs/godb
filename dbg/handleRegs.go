@@ -9,7 +9,7 @@ func (dbger *TypeDbg) GetRegs() (*unix.PtraceRegs, error) {
 	regs := &unix.PtraceRegs{}
 	err := unix.PtraceGetRegs(dbger.pid, regs)
 	if err != nil {
-		return nil, errors.New(stWrong)
+		return nil, err
 	}
 
 	return regs, nil

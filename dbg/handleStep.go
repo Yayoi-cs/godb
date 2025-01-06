@@ -7,13 +7,12 @@ import (
 
 func (dbger *TypeDbg) wait() (unix.WaitStatus, error) {
 	var ws unix.WaitStatus
-	_, err := unix.Wait4(0, &ws, unix.WALL, nil)
+	_, err := unix.Wait4(dbger.pid, &ws, unix.WCONTINUED, nil)
 	if err != nil {
 		return 0, err
 	}
 	if ws.Exited() {
 		fmt.Println("target exited")
-		return 0, fmt.Errorf("wait exited")
 	}
 	if ws.Stopped() {
 		rip, err := dbger.GetRip()
