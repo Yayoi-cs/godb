@@ -34,9 +34,17 @@ func (dbger *TypeDbg) LoadBase() error {
 		return err
 	}
 	defer fd.Close()
+	dbger.bases = TypeAddr{
+		bin:  0,
+		stk:  0,
+		heap: 0,
+		libc: 0,
+		ld:   0,
+	}
 	scanner := bufio.NewScanner(fd)
 	for scanner.Scan() {
 		line := scanner.Text()
+		//fmt.Println(line)
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
@@ -44,8 +52,9 @@ func (dbger *TypeDbg) LoadBase() error {
 		if len(fields) < 5 {
 			continue
 		}
-		binname := fields[5]
-		if strings.HasPrefix(binname, dbger.path) && dbger.bases.bin != 0 {
+		binName := fields[5]
+
+		if binName == dbger.path && dbger.bases.bin == 0 {
 			addrArea := fields[0]
 			addrStr := strings.Split(addrArea, "-")[0]
 			addr, err := strconv.ParseUint(addrStr, 16, 64)
@@ -53,7 +62,7 @@ func (dbger *TypeDbg) LoadBase() error {
 				return err
 			}
 			dbger.bases.bin = uintptr(addr)
-		} else if strings.HasPrefix(binname, "[heap]") && dbger.bases.heap != 0 {
+		} else if strings.Contains(binName, "[heap]") && dbger.bases.heap == 0 {
 			addrArea := fields[0]
 			addrStr := strings.Split(addrArea, "-")[0]
 			addr, err := strconv.ParseUint(addrStr, 16, 64)
@@ -61,7 +70,7 @@ func (dbger *TypeDbg) LoadBase() error {
 				return err
 			}
 			dbger.bases.heap = uintptr(addr)
-		} else if strings.HasPrefix(binname, "[stack]") && dbger.bases.stk != 0 {
+		} else if strings.Contains(binName, "[stack]") && dbger.bases.stk == 0 {
 			addrArea := fields[0]
 			addrStr := strings.Split(addrArea, "-")[0]
 			addr, err := strconv.ParseUint(addrStr, 16, 64)
@@ -69,7 +78,7 @@ func (dbger *TypeDbg) LoadBase() error {
 				return err
 			}
 			dbger.bases.stk = uintptr(addr)
-		} else if strings.Contains(binname, "libc") && dbger.bases.libc != 0 {
+		} else if strings.Contains(binName, "libc") && dbger.bases.libc == 0 {
 			addrArea := fields[0]
 			addrStr := strings.Split(addrArea, "-")[0]
 			addr, err := strconv.ParseUint(addrStr, 16, 64)
@@ -77,7 +86,7 @@ func (dbger *TypeDbg) LoadBase() error {
 				return err
 			}
 			dbger.bases.libc = uintptr(addr)
-		} else if strings.Contains(binname, "ld") && dbger.bases.ld != 0 {
+		} else if strings.Contains(binName, "ld") && dbger.bases.ld == 0 {
 			addrArea := fields[0]
 			addrStr := strings.Split(addrArea, "-")[0]
 			addr, err := strconv.ParseUint(addrStr, 16, 64)
@@ -87,10 +96,11 @@ func (dbger *TypeDbg) LoadBase() error {
 			dbger.bases.ld = uintptr(addr)
 		}
 	}
+	fmt.Printf("[-]target loaded at: %x\n", dbger.bases.bin)
 	return nil
 }
 
-func Run(bin string, args ...string) (*TypeDbg, error) {
+func Run(bin string, pie bool, args ...string) (*TypeDbg, error) {
 	absPath, err := filepath.Abs(bin)
 	if err != nil {
 		return nil, err
@@ -120,14 +130,12 @@ func Run(bin string, args ...string) (*TypeDbg, error) {
 		},
 		bps: make(map[uintptr]*TypeBp),
 	}
-	err = dbger.LoadBase()
+	if pie {
+		err = dbger.LoadBase()
+	}
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Printf("[*]dbger started at pid: %d\n", dbger.pid)
 	return dbger, nil
-}
-
-func Start() {
-
 }

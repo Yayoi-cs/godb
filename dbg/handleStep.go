@@ -12,9 +12,26 @@ func (dbger *TypeDbg) wait() (unix.WaitStatus, error) {
 		return 0, err
 	}
 	if ws.Exited() {
+		fmt.Println("target exited")
 		return 0, fmt.Errorf("wait exited")
 	}
+	if ws.Stopped() {
+		rip, err := dbger.GetRip()
+		if err != nil {
+			return 0, err
+		}
+		_, ok := dbger.bps[uintptr(rip)]
+		if ok {
+			fmt.Printf("[-]reach2breakpoint at %x\n", rip)
+		} else {
+			fmt.Printf("[-]Dbger Stopped at %x\n", rip)
+		}
+	}
 	return ws, nil
+}
+
+func (dbger *TypeDbg) Wait() (unix.WaitStatus, error) {
+	return dbger.wait()
 }
 
 func (dbger *TypeDbg) Continue() error {
@@ -44,7 +61,7 @@ func (dbger *TypeDbg) Continue() error {
 	}
 	err = unix.PtraceCont(dbger.pid, 0)
 	if err != nil {
-		fmt.Errorf("[-]failed to continue: %w", err)
+		return err
 	}
 	return nil
 }

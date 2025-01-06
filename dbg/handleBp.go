@@ -10,11 +10,12 @@ import (
 func (dbger *TypeDbg) Break(bpAddr interface{}) (*TypeBp, error) {
 	pid := dbger.pid
 	switch v := bpAddr.(type) {
-	case uintptr:
-		nbp, err := newBp(v, pid)
+	case int:
+		nbp, err := newBp(uintptr(v)+dbger.bases.bin, pid)
 		if err != nil {
 			return nil, err
 		}
+		dbger.bps[uintptr(v)+dbger.bases.bin] = nbp
 		return nbp, nil
 	case string:
 		fmt.Println("to be continued")
@@ -76,5 +77,6 @@ func newBp(bpAddr uintptr, pid int) (*TypeBp, error) {
 	if err := bp.EnableBp(); err != nil {
 		return nil, err
 	}
+	fmt.Printf("[i]break point added at %x\n", bpAddr)
 	return bp, nil
 }

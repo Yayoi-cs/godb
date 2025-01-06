@@ -6,18 +6,8 @@ import (
 )
 
 func (dbger *TypeDbg) GetRegs() (*unix.PtraceRegs, error) {
-	pid := dbger.pid
-	var ws unix.WaitStatus
-	_, err := unix.Wait4(pid, &ws, unix.WNOHANG, nil)
-	if err != nil {
-		return nil, err
-	}
-	if !ws.Stopped() && ws.Signal() != unix.SIGSTOP {
-		return nil, errors.New(plsStop)
-	}
-
 	regs := &unix.PtraceRegs{}
-	err = unix.PtraceGetRegs(pid, regs)
+	err := unix.PtraceGetRegs(dbger.pid, regs)
 	if err != nil {
 		return nil, errors.New(stWrong)
 	}
