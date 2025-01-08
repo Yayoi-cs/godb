@@ -20,50 +20,60 @@ type typeRes struct {
 
 func analyze(wg *sync.WaitGroup, retChan chan typeRes, ctx context.Context, id int, flag string) {
 	defer wg.Done()
-	bin := "/home/tsuneki/dc/ctf/alpaca/r8/hidden"
+	bin := "/dc/ctf/alpaca/r8/hidden"
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		dbger, err := dbg.Run(bin, true, flag)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		dbger.Wait()
-		_, err = dbger.Break(0x151c)
-		if err != nil {
-			fmt.Println(err)
-		}
-		dbger.Continue()
-		dbger.Wait()
-		rdi, err := dbger.GetRdi()
-		if err != nil {
-			fmt.Printf("[%x]%v\n", id, err)
-		}
-		rsi, err := dbger.GetRsi()
-		if err != nil {
-			fmt.Printf("[%x]%v\n", id, err)
-		}
-		//fmt.Printf("rdi: %x ,rsi: %x\n", rdi, rsi)
-		var i int
-		lflag := len(flag)
-		for i = 0; i < lflag+2; i++ {
-			rdiVal, err := dbger.GetMemory1(uintptr(rdi + uint64(i)))
+
+	outerloop:
+		for j := 0; j < 10; j++ {
+			dbger, err := dbg.Run(bin, true, flag)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			dbger.Wait()
+			_, err = dbger.Break(0x151c)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			dbger.Continue()
+			dbger.Wait()
+			rdi, err := dbger.GetRdi()
 			if err != nil {
 				fmt.Printf("[%x]%v\n", id, err)
+				continue
 			}
-			rsiVal, err := dbger.GetMemory1(uintptr(rsi + uint64(i)))
+			rsi, err := dbger.GetRsi()
 			if err != nil {
 				fmt.Printf("[%x]%v\n", id, err)
+				continue
 			}
-			//fmt.Printf("%x:[%x]%x ,[%x]%x\n", id, rdi+uint64(i), rdiVal, rsi+uint64(i), rsiVal)
-			if rdiVal != rsiVal || rdiVal == 0 || rsiVal == 0 {
-				break
+			//fmt.Printf("rdi: %x ,rsi: %x\n", rdi, rsi)
+			var i int
+			lflag := len(flag)
+			for i = 0; i < lflag+2; i++ {
+				rdiVal, err := dbger.GetMemory1(uintptr(rdi + uint64(i)))
+				if err != nil {
+					fmt.Printf("[%x]%v\n", id, err)
+					continue outerloop
+				}
+				rsiVal, err := dbger.GetMemory1(uintptr(rsi + uint64(i)))
+				if err != nil {
+					fmt.Printf("[%x]%v\n", id, err)
+					continue outerloop
+				}
+				//fmt.Printf("%x:[%x]%x ,[%x]%x\n", id, rdi+uint64(i), rdiVal, rsi+uint64(i), rsiVal)
+				if rdiVal != rsiVal || rdiVal == 0 || rsiVal == 0 {
+					break
+				}
 			}
+			retChan <- typeRes{flag[lflag-1], i}
+			dbger.Continue()
+			fmt.Printf("[%x]End analysis\n", id)
+			break
 		}
-		retChan <- typeRes{flag[lflag-1], i}
-		dbger.Continue()
-		fmt.Printf("[%x]End analysis\n", id)
 	}()
 	select {
 	case <-ctx.Done():
@@ -80,7 +90,7 @@ func main() {
 		var wg sync.WaitGroup
 		for i, c := range charset {
 			fmt.Println(flag + string(c))
-			time.Sleep(time.Millisecond * 25)
+			time.Sleep(time.Millisecond * 10)
 			f := flag + string(c)
 			ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 			defer cancel()
