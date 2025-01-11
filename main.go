@@ -10,7 +10,6 @@ import (
 
 const (
 	charset = "abcdefghijklmnopqrstuvwxyz0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ{}"
-	//charset = "at8"
 )
 
 type typeRes struct {
@@ -20,7 +19,7 @@ type typeRes struct {
 
 func analyze(wg *sync.WaitGroup, retChan chan typeRes, ctx context.Context, id int, flag string) {
 	defer wg.Done()
-	bin := "/dc/ctf/alpaca/r8/hidden"
+	bin := "~/dc/ctf/alpaca/r8/hidden"
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
@@ -77,7 +76,6 @@ func analyze(wg *sync.WaitGroup, retChan chan typeRes, ctx context.Context, id i
 	}()
 	select {
 	case <-ctx.Done():
-
 	case <-done:
 	}
 }

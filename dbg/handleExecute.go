@@ -101,7 +101,15 @@ func (dbger *TypeDbg) LoadBase() error {
 }
 
 func Run(bin string, pie bool, args ...string) (*TypeDbg, error) {
-	absPath, err := filepath.Abs(bin)
+	absPath := bin
+	if strings.HasPrefix(bin, "~") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, err
+		}
+		absPath = filepath.Join(home, bin[1:])
+	}
+	absPath, err := filepath.Abs(absPath)
 	if err != nil {
 		return nil, err
 	}
