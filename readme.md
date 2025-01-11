@@ -173,4 +173,8 @@ func (dbger *TypeDbg) SetMemory1(data uint8, addr uintptr) error
 func (dbger *TypeDbg) SetMemory2(data uint16, addr uintptr) error
 func (dbger *TypeDbg) SetMemory4(data uint32, addr uintptr) error
 func (dbger *TypeDbg) SetMemory8(data uint64, addr uintptr) error
+
+func (dbger *TypeDbg) SendLine(payload []byte) error
+func (dbger *TypeDbg) Send(payload []byte) error
+func (dbger *TypeDbg) Recv() ([]byte, error)
 ```
