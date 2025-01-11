@@ -3,7 +3,7 @@ the fastest debugger for brute-force
 ## benchmarks
 x15 faster than gdb script.
 * alpacaHack round8
-  * launch 6890 process and over 361,725 memory access in 85s
+  * launch 6,890 process and over 361,725 memory access in 85s
   * example in main.go
 ## example
 ### run
@@ -46,10 +46,8 @@ dbger.Continue()
 dbger.Wait()
 ```
 ### parallel debug
-:::note
-godb is so fast. if launch many process in no wait, many error will be caused.
-so, I recommend to add try like method in analysis function with timeout.
-:::
+> godb is so fast. if launch many process in no wait, many error will be caused.
+> so, I recommend to add try like method in analysis function with timeout.
 ```go
 const (
 	charset = "abcdefghijklmnopqrstuvwxyz0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ{}"
