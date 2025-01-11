@@ -26,7 +26,7 @@ func analyze(wg *sync.WaitGroup, retChan chan typeRes, ctx context.Context, id i
 
 	outerloop:
 		for j := 0; j < 10; j++ {
-			dbger, err := dbg.Run(bin, true, flag)
+			dbger, err := dbg.Run(bin, true, false, flag)
 			if err != nil {
 				fmt.Println(err)
 				continue

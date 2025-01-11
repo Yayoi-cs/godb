@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"golang.org/x/sys/unix"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -13,10 +14,14 @@ import (
 )
 
 type TypeDbg struct {
-	pid   int
-	path  string
-	bases TypeAddr
-	bps   map[uintptr]*TypeBp
+	pid          int
+	path         string
+	bases        TypeAddr
+	stdinReader  *io.PipeReader
+	stdinWriter  *io.PipeWriter
+	stdoutReader *io.PipeReader
+	stdoutWriter *io.PipeWriter
+	bps          map[uintptr]*TypeBp
 }
 
 type TypeAddr struct {
@@ -100,7 +105,7 @@ func (dbger *TypeDbg) LoadBase() error {
 	return nil
 }
 
-func Run(bin string, pie bool, args ...string) (*TypeDbg, error) {
+func Run(bin string, pie bool, pipe bool, args ...string) (*TypeDbg, error) {
 	absPath := bin
 	if strings.HasPrefix(bin, "~") {
 		home, err := os.UserHomeDir()
@@ -113,21 +118,8 @@ func Run(bin string, pie bool, args ...string) (*TypeDbg, error) {
 	if err != nil {
 		return nil, err
 	}
-	cmd := exec.Command(absPath, args...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	cmd.SysProcAttr = &unix.SysProcAttr{
-		Ptrace: true,
-	}
-
-	if err = cmd.Start(); err != nil {
-		log.Fatalf("failed to start %v: %v", bin, err)
-	}
-
 	dbger := &TypeDbg{
-		pid:  cmd.Process.Pid,
+		pid:  -1,
 		path: absPath,
 		bases: TypeAddr{
 			bin:  0,
@@ -138,6 +130,35 @@ func Run(bin string, pie bool, args ...string) (*TypeDbg, error) {
 		},
 		bps: make(map[uintptr]*TypeBp),
 	}
+	cmd := exec.Command(absPath, args...)
+	if pipe {
+		stdinR, stdinW := io.Pipe()
+		stdoutR, stdoutW := io.Pipe()
+		dbger.stdinReader = stdinR
+		dbger.stdinWriter = stdinW
+		dbger.stdoutReader = stdoutR
+		dbger.stdoutWriter = stdoutW
+		cmd.Stdin = stdinR
+		cmd.Stdout = stdoutW
+		cmd.Stderr = os.Stderr
+	} else {
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		dbger.stdinWriter = nil
+		dbger.stdinReader = nil
+		dbger.stdoutReader = nil
+		dbger.stdoutWriter = nil
+	}
+
+	cmd.SysProcAttr = &unix.SysProcAttr{
+		Ptrace: true,
+	}
+
+	if err = cmd.Start(); err != nil {
+		log.Fatalf("failed to start %v: %v", bin, err)
+	}
+	dbger.pid = cmd.Process.Pid
 	if pie {
 		err = dbger.LoadBase()
 	}
