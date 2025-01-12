@@ -1,11 +1,10 @@
 # godb
-the fastest debugger for brute-force
+> the fastest debugger for brute-force
 ## benchmarks
-x34 faster than gdb script.
-* alpacaHack round8
-  * 35sec in
-    * launching 6,890 process over 361,725 memory access
-    * brute-forcing 105 length flag
+**x34 faster** than my [gdb script](https://hackmd.io/@tsuneki/SJClekl8yg#solver8).
+* [alpacaHack round8: hidden](https://alpacahack.com/ctfs/round-8/challenges/hidden)
+  * Launched **6890 processes** in just **35 sec**, executing **361,725 memory accesses**.
+  * Successfully brute-forced a **105-character** flag in correctly.
 ## example
 ### run
 ```go
@@ -93,6 +92,7 @@ It's possible to solve by brute force
 Solver in main.go in master branch
 [main.go:godb-master](https://github.com/Yayoi-cs/godb/blob/master/main.go)
 ## functions
+> sender.go is currently under development
 ```go
 func Run(bin string, pie bool, args ...string) (*TypeDbg, error)
 func (dbger *TypeDbg) LoadBase() error 
