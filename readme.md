@@ -1,10 +1,11 @@
 # godb
 the fastest debugger for brute-force
 ## benchmarks
-x15 faster than gdb script.
+x34 faster than gdb script.
 * alpacaHack round8
-  * launch 6,890 process and over 361,725 memory access in 85s
-  * example in main.go
+  * 35sec in
+    * launching 6,890 process over 361,725 memory access
+    * brute-forcing 105 length flag
 ## example
 ### run
 ```go

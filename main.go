@@ -88,7 +88,7 @@ func main() {
 		var wg sync.WaitGroup
 		for i, c := range charset {
 			fmt.Println(flag + string(c))
-			time.Sleep(time.Millisecond * 10)
+			time.Sleep(time.Millisecond * 5)
 			f := flag + string(c)
 			ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 			defer cancel()
